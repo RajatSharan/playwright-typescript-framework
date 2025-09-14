@@ -25,7 +25,8 @@ export default defineConfig({
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     ['list'],                 // keep console output
-    ['html', { open: 'always' }]  // 👈 auto-open in browser
+    ['html', { open: 'never' }] ,
+    ['allure-playwright']
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
