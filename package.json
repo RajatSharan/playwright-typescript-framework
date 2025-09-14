@@ -2,7 +2,18 @@
   "name": "playwright-typescript-framework",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "npx playwright test",
+    "test:one": "npx playwright test tests/tests.spec.ts",
+    "test:login": "npx playwright test src/tests/login.spec.ts",
+    "test:data": "npx playwright test src/tests/testdataGenerator.spec.ts",
+    "test:all": "npx playwright test src/tests",
+    "report": "npx playwright show-report",
+    "test:login:chrome": "npx playwright test src/tests/login.spec.ts --headed --project=chromium --reporter=html",
+    "allure:generate": "npx allure generate ./allure-results --clean -o ./allure-report",
+    "allure:open": "npx allure open ./allure-report",
+    "allure:login:report":"npx playwright test src/tests/login.spec.ts --reporter=allure-playwright"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -10,6 +21,8 @@
   "devDependencies": {
     "@playwright/test": "^1.55.0",
     "@types/node": "^24.3.0",
+    "allure-commandline": "^2.34.1",
+    "allure-playwright": "^3.4.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2"
   }

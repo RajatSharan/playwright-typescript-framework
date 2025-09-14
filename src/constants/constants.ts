@@ -7,8 +7,8 @@ import path from 'path';
 */
 
 
-export const TEST_DATA_PATH = path.resolve(process.cwd(), 'src/resources/testdata/testdata.json');
-export const LOGIN_DATA_PATH= path.resolve(process.cwd(),'src/resources/testdata/logindata.json')
+export const TEST_DATA_PATH = path.resolve(__dirname, '../resources/testdata/testdata.json');
+export const LOGIN_DATA_PATH= path.resolve(__dirname,'../resources/testdata/logindata.json')
 
 
 /**
