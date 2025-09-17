@@ -10,7 +10,7 @@ import path from 'path';
 export const TEST_DATA_PATH = path.resolve(__dirname, '../resources/testdata/testdata.json');
 export const LOGIN_DATA_PATH= path.resolve(__dirname,'../resources/testdata/logindata.json')
 export const create_user_payload= path.resolve(__dirname,'../resources/testdata/create_user_payload.json')
-
+export const update_user_payload= path.resolve(__dirname,'../resources/testdata/update_user_payload.json')
 /**
 * Timeout constant for small actions/assertions, set to 5000 milliseconds (5 seconds).
 */
