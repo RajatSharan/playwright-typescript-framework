@@ -28,9 +28,9 @@ export class UserApi{
         return response
 
     }
-     async getSingleUser(users:number){
+     async getSingleUser(id:number){
 
-        const response  = await this.request.get(`${API_BASE_URL}/api/users/${users}`,{
+        const response  = await this.request.get(`${API_BASE_URL}/api/users/${id}`,{
         headers: commonHeaders
         })
         expect(response.status()).toBe(200)
