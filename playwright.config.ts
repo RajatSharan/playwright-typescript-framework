@@ -19,23 +19,22 @@ export default defineConfig({
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 2 : 1,
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [
-    ['list'],                 // keep console output
-    ['html', { open: 'never' }] ,
-    ['allure-playwright']
-  ],
+    reporter:process.env.CI? [
+    ['list'], ['html', { open: 'never' }] ,['allure-playwright']] 
+   :[['list'], ['html', { open: 'never' }] , ['allure-playwright']]
+  ,
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
     // baseURL: 'http://localhost:3000',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
-    headless:false,
+    trace:process.env.CI? 'on-first-retry':'off',
+    headless:process.env.CI?true:false,
     launchOptions:{
       slowMo:1000
     }
