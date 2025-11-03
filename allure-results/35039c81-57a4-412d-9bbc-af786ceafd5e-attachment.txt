@@ -1,0 +1,5 @@
+[2025-11-03T03:53:31.120Z] INFO: Navigating to the login page
+[2025-11-03T03:53:33.364Z] INFO: Filling username and password
+[2025-11-03T03:53:35.540Z] INFO: Clicking login button
+[2025-11-03T03:53:36.974Z] INFO: Checking the inventory page
+[2025-11-03T03:53:37.193Z] INFO: Login Successfull
