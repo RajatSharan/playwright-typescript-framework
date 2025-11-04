@@ -1,0 +1,1 @@
+[2025-11-03T03:53:36.844Z] WARN: Login failed as expected for username: locked_out_user
