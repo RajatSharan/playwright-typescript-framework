@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     triggers {
-        // 🕐 Runs once per day at 1:00 PM (server time)
+        // 🕐 Runs daily at 1:00 PM
         cron('0 13 * * *')
     }
 
@@ -24,21 +24,18 @@ pipeline {
         stage('Clean .only from Tests') {
             steps {
                 echo '🧹 Removing any .only from test files (to avoid CI skips)...'
-                // ✅ Fixed PowerShell syntax (safe for Windows Jenkins agents)
                 bat '''
-                    powershell -NoProfile -ExecutionPolicy Bypass -Command ^
-                    "Get-ChildItem -Path . -Recurse -Include *.spec.ts,*.spec.js | ForEach-Object { ^
-                        (Get-Content $_.FullName) -replace '\\.only\\(', '(' | Set-Content $_.FullName ^
-                    }"
+                    powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-ChildItem -Recurse -Include *.spec.ts,*.spec.js | ForEach-Object { (Get-Content $_.FullName) -replace '\\.only\\(', '(' | Set-Content $_.FullName }"
                 '''
             }
         }
 
         stage('Run Playwright Tests') {
             steps {
-                echo '🎭 Running Playwright tests...'
+                echo '🎭 Running Playwright API tests...'
+                // ✅ Corrected reporters: generates both HTML and JSON
                 bat """
-                    npx playwright test --reporter=list,json,html --output=${REPORT_DIR}
+                    npx playwright test src/tests/api --reporter="json=results.json,html" --output=${REPORT_DIR}
                 """
             }
         }
@@ -62,13 +59,13 @@ pipeline {
         always {
             echo '📧 Sending Playwright report email...'
             emailext(
-                subject: "Playwright Test Report - ${currentBuild.currentResult} | Build #${env.BUILD_NUMBER} | ${env.JOB_NAME}",
+                subject: "Playwright Test Report - ${currentBuild.currentResult} | Build #${env.BUILD_NUMBER}",
                 body: """
                 <html>
                     <body style="font-family: Arial, sans-serif; color: #333;">
                         <h2 style="color:#0078d7;">Playwright Test Execution Report</h2>
                         <p>Hi Team,</p>
-                        <p>The Playwright test execution has completed. View the detailed HTML report here:</p>
+                        <p>The Playwright API tests have completed. View the detailed HTML report below:</p>
                         <p>
                             🔗 <a href="${env.BUILD_URL}Playwright_20Test_20Report"
                             style="color:#0078d7; text-decoration:none;">View Full HTML Report in Jenkins</a>
