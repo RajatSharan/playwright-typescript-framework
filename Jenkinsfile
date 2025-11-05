@@ -2,8 +2,7 @@ pipeline {
     agent any
 
     triggers {
-        // 🕐 Runs every day at 1:00 PM server time
-        cron('20 15 * * *')
+        cron('0 6 * * *')
     }
 
     environment {
@@ -33,7 +32,6 @@ pipeline {
         stage('Run Playwright Tests') {
             steps {
                 echo '🎭 Running Playwright API tests...'
-                // ✅ Fixed: Use correct reporter syntax
                 bat """
                     npx playwright test src/tests/api --reporter=html,json --output=${REPORT_DIR}
                     if exist ${REPORT_DIR}\\test-results.json (
@@ -86,11 +84,11 @@ pipeline {
         }
 
         failure {
-            echo '❌ Build failed! Check Playwright test logs.'
+            echo 'Build failed! Check Playwright test logs.'
         }
 
         success {
-            echo '✅ Build succeeded!'
+            echo 'Build succeeded!'
         }
     }
 }
