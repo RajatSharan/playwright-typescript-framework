@@ -23,10 +23,12 @@ pipeline {
 
         stage('Clean .only from Tests') {
             steps {
-                echo '🧹 Removing any .only from test files to prevent CI skips...'
+                echo '🧹 Removing any .only from test files (to avoid CI skips)...'
+                // ✅ Fixed PowerShell syntax (safe for Windows Jenkins agents)
                 bat '''
-                    powershell -Command "(Get-ChildItem -Recurse -Include *.spec.ts,*.spec.js) | ForEach-Object {
-                        (Get-Content $_.FullName) -replace '\\.only\\(', '(' | Set-Content $_.FullName
+                    powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+                    "Get-ChildItem -Path . -Recurse -Include *.spec.ts,*.spec.js | ForEach-Object { ^
+                        (Get-Content $_.FullName) -replace '\\.only\\(', '(' | Set-Content $_.FullName ^
                     }"
                 '''
             }
@@ -34,7 +36,7 @@ pipeline {
 
         stage('Run Playwright Tests') {
             steps {
-                echo '🎭 Running Playwright tests with HTML + JSON reporters...'
+                echo '🎭 Running Playwright tests...'
                 bat """
                     npx playwright test --reporter=list,json,html --output=${REPORT_DIR}
                 """
@@ -82,11 +84,11 @@ pipeline {
         }
 
         failure {
-            echo 'Build failed! Check Playwright test logs.'
+            echo '❌ Build failed! Check Playwright test logs.'
         }
 
         success {
-            echo 'Build succeeded!'
+            echo '✅ Build succeeded!'
         }
     }
 }
