@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     triggers {
-        // 🕐 Runs daily at 1:00 PM
+        // 🕐 Runs every day at 1:00 PM server time
         cron('0 13 * * *')
     }
 
@@ -33,9 +33,14 @@ pipeline {
         stage('Run Playwright Tests') {
             steps {
                 echo '🎭 Running Playwright API tests...'
-                // ✅ Corrected reporters: generates both HTML and JSON
+                // ✅ Fixed: Use correct reporter syntax
                 bat """
-                    npx playwright test src/tests/api --reporter="json=results.json,html" --output=${REPORT_DIR}
+                    npx playwright test src/tests/api --reporter=html,json --output=${REPORT_DIR}
+                    if exist ${REPORT_DIR}\\test-results.json (
+                        echo ✅ JSON report generated successfully.
+                    ) else (
+                        echo ⚠️ JSON report missing.
+                    )
                 """
             }
         }
