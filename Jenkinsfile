@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     triggers {
+        // Updated to run precisely at 1:00 PM every day (0 minutes past the 13th hour).
         cron('0 13 * * *') 
     }
 
@@ -23,7 +24,8 @@ pipeline {
         stage('Run Playwright Tests') {
             steps {
                 echo 'Running Playwright API tests...'
-           
+                // Added --output flag to explicitly ensure the report lands in the correct directory.
+                // This command generates HTML in playwright-report and a results.json file.
                 bat 'npx playwright test --reporter=html,json=results.json --output=${REPORT_DIR}'
             }
         }
@@ -31,9 +33,9 @@ pipeline {
         stage('Publish Report') {
             steps {
                 echo 'Publishing HTML report...'
-          
+                // The mandatory 'allowMissing: false' parameter is required for compilation.
                 publishHTML([
-                    allowMissing: false, 
+                    allowMissing: false, // MANDATORY FIX: Fails the step if the directory is missing
                     reportDir: "${REPORT_DIR}",
                     reportFiles: 'index.html',
                     reportName: 'Playwright Test Report',
