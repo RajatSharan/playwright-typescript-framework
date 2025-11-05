@@ -3,7 +3,7 @@ pipeline {
 
     triggers {
         // 🕐 Runs every day at 1:00 PM server time
-        cron('0 13 * * *')
+        cron('30 15 * * *')
     }
 
     environment {
