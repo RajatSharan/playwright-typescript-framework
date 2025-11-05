@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     triggers {
-        // Runs every day at 1:00 PM
+        // Run every day at 1:00 PM
         cron('0 13 * * *')
     }
 
@@ -24,7 +24,9 @@ pipeline {
         stage('Run Playwright Tests') {
             steps {
                 echo 'Running Playwright API tests...'
-                bat "npx playwright test --reporter=html,json=results.json --output=${REPORT_DIR}"
+                // ✅ Correct multi-reporter syntax
+                // JSON will be automatically saved inside output folder
+                bat "npx playwright test --reporter=list,json,html --output=${REPORT_DIR}"
             }
         }
 
@@ -32,12 +34,12 @@ pipeline {
             steps {
                 echo 'Publishing HTML report...'
                 publishHTML([
-                    allowMissing: false, // Required
-                    alwaysLinkToLastBuild: true,
-                    keepAll: true,
+                    allowMissing: false,
                     reportDir: "${REPORT_DIR}",
                     reportFiles: 'index.html',
-                    reportName: 'Playwright Test Report'
+                    reportName: 'Playwright Test Report',
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true
                 ])
             }
         }
@@ -45,7 +47,9 @@ pipeline {
 
     post {
         always {
-            echo 'Sending test report email...'
+            script {
+                echo 'Sending test report email...'
+            }
 
             emailext(
                 subject: "Playwright Test Report - ${currentBuild.currentResult} | Build #${env.BUILD_NUMBER} | ${env.JOB_NAME}",
@@ -56,7 +60,7 @@ pipeline {
                         <p>Hi Team,</p>
                         <p>The Playwright test execution has been completed. Please find the report attached and/or view it in Jenkins:</p>
                         <p>
-                            📊 <a href="${env.BUILD_URL}Playwright_20Test_20Report"
+                            📊 <a href="${env.BUILD_URL}Playwright_20Test_20Report" 
                             style="color: #0078d7; text-decoration: none;">View Full HTML Report in Jenkins</a>
                         </p>
                         <p>Thanks,<br><b>Jenkins CI</b></p>
