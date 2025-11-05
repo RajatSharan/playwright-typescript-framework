@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     triggers {
-        // Updated to run precisely at 1:00 PM every day (0 minutes past the 13th hour).
-        cron('0 13 * * *') 
+        // Runs every day at 1:00 PM (server time)
+        cron('15 13 * * *')
     }
 
     environment {
@@ -24,23 +24,23 @@ pipeline {
         stage('Run Playwright Tests') {
             steps {
                 echo 'Running Playwright API tests...'
-                // Added --output flag to explicitly ensure the report lands in the correct directory.
-                // This command generates HTML in playwright-report and a results.json file.
-                bat 'npx playwright test --reporter=html,json=results.json --output=${REPORT_DIR}'
+                // Use %REPORT_DIR% for Windows shell variable reference
+                bat '''
+                    npx playwright test --reporter=html,json=results.json --output=playwright-report
+                '''
             }
         }
 
-        stage('Publish Report') {
+        stage('Publish HTML Report') {
             steps {
                 echo 'Publishing HTML report...'
-                // The mandatory 'allowMissing: false' parameter is required for compilation.
                 publishHTML([
-                    allowMissing: false, // MANDATORY FIX: Fails the step if the directory is missing
-                    reportDir: "${REPORT_DIR}",
-                    reportFiles: 'index.html',
-                    reportName: 'Playwright Test Report',
-                    alwaysLinkToLastBuild: true,
-                    keepAll: true
+                    allowMissing: false,               // Prevents build from passing if report is missing
+                    alwaysLinkToLastBuild: true,       // Keeps latest report linked in Jenkins
+                    keepAll: true,                     // Retains reports for all builds
+                    reportDir: 'playwright-report',    // Folder where HTML report is generated
+                    reportFiles: 'index.html',         // Entry file for the report
+                    reportName: 'Playwright Test Report'
                 ])
             }
         }
@@ -48,25 +48,23 @@ pipeline {
 
     post {
         always {
-            script {
-                echo 'Sending test report email...'
-            }
+            echo 'Sending test report email...'
 
             emailext(
                 subject: "Playwright Test Report - ${currentBuild.currentResult} | Build #${env.BUILD_NUMBER} | ${env.JOB_NAME}",
                 body: """
-                <html>
-                    <body style="font-family: Arial, sans-serif; color: #333;">
-                        <h2 style="color: #0078d7;">Playwright Test Execution Report</h2>
-                        <p>Hi Team,</p>
-                        <p>The Playwright test execution has been completed. Please find the report attached and/or view it in Jenkins:</p>
-                        <p>
-                            📊 <a href="${env.BUILD_URL}Playwright_20Test_20Report" 
-                            style="color: #0078d7; text-decoration: none;">View Full HTML Report in Jenkins</a>
-                        </p>
-                        <p>Thanks,<br><b>Jenkins CI</b></p>
-                    </body>
-                </html>
+                    <html>
+                        <body style="font-family: Arial, sans-serif; color: #333;">
+                            <h2 style="color: #0078d7;">Playwright Test Execution Report</h2>
+                            <p>Hi Team,</p>
+                            <p>The Playwright test execution has been completed. Please find the report attached and/or view it in Jenkins:</p>
+                            <p>
+                                📊 <a href="${env.BUILD_URL}Playwright_20Test_20Report"
+                                style="color: #0078d7; text-decoration: none;">View Full HTML Report in Jenkins</a>
+                            </p>
+                            <p>Thanks,<br><b>Jenkins CI</b></p>
+                        </body>
+                    </html>
                 """,
                 mimeType: 'text/html',
                 to: 'sharanrajat05@gmail.com',
@@ -76,11 +74,11 @@ pipeline {
         }
 
         failure {
-            echo 'Build failed!'
+            echo '❌ Build failed! Please check the logs.'
         }
 
         success {
-            echo 'Build succeeded!'
+            echo '✅ Build succeeded!'
         }
     }
 }
