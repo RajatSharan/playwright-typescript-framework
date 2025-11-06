@@ -45,7 +45,7 @@ pipeline {
 
         stage('Publish HTML Report') {
             steps {
-                echo '📊 Publishing Playwright HTML report...'
+                echo 'Publishing Playwright HTML report...'
                 publishHTML([
                     allowMissing: false,
                     alwaysLinkToLastBuild: true,
